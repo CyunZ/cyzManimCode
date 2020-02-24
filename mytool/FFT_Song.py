@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from pydub import AudioSegment
 import struct
 from scipy.fftpack import fft,ifft,fftfreq,rfft,irfft
