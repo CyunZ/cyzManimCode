@@ -505,7 +505,7 @@ class Part1_8(Scene):
 # 带通滤波
 class Part2(Scene):
     def construct(self):
-        params = FFT_Song.getSongFormula2("jojoVoice2.wav",0)
+        params = FFT_Song.getSongFormula("jojoVoice2.wav",0)
         
         np_params = np.array(params)
         freq = np.array([0]*4200) # 取前5000个频率及其对应强度
@@ -549,7 +549,6 @@ class Part2(Scene):
             for i in range(len(freq))
         ])
 
-        print(max_freq)
         numTexs = []
         for i in range(14):
             num = 300*(i+1)
@@ -566,7 +565,7 @@ class Part2(Scene):
         self.play(ShowCreation(curve))
         self.wait(2)
         
-        params = FFT_Song.getSongFormula2("jo65_1100.wav",0)
+        params = FFT_Song.getSongFormula("jo65_1100.wav",0)
         freq = np.array([0]*5000) # 取前5000个频率及其对应强度
         amplitudes =np.array([0]*5000) 
         for i in range(5000):
@@ -592,7 +591,7 @@ class Part2(Scene):
         )
         self.wait(2)
 
-        params = FFT_Song.getSongFormula2("jo270_3000.wav",0)
+        params = FFT_Song.getSongFormula("jo270_3000.wav",0)
         freq = np.array([0]*5000) # 取前5000个频率及其对应强度
         amplitudes =np.array([0]*5000) 
         for i in range(5000):
