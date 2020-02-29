@@ -23,7 +23,6 @@ class Part0(Scene):
         fg3 = FunctionGraph(fun3,color=GREEN_C)
         equation3 = TexMobject("y_3=cos(2\\pi x\\times 2)+cos(2\\pi x\\times 4+{45\\over 180}\\pi )")
         equation3.set_y(2 - FRAME_Y_RADIUS - 0.5)
-        g3 = VGroup(fg3,equation3)
 
         axes1 = Axes(y_min=-1.5, y_max=1.5)
         copy_axes1 = axes1.copy()
@@ -46,8 +45,14 @@ class Part0(Scene):
         self.play(ShowCreation(add))
         self.play( Transform(axes1,axes2) )
         self.wait(1)
+        
+        g1_2 = VGroup(fg1.copy(),fg2.copy())
+        g3 = VGroup(g1_2,equation3)
 
-        self.play(ShowCreation(g3))
+        self.play(
+            Transform(g1_2  , fg3),
+            ShowCreation(equation3)
+        )
         self.wait(2)
 
         self.play(ApplyMethod( g3.scale,0.4) )
@@ -118,8 +123,12 @@ class Part0_5(MovingCameraScene):
         fg5 = FunctionGraph(fun5,color=GREEN_C)
         equation5 = TexMobject("y_3=cos(2\\pi x\\times 220)+cos(2\\pi x\\times 1080)")
         equation5.set_y(2 - FRAME_Y_RADIUS - 0.5)
-        g5 = VGroup(fg5,equation5)
-        self.play(ShowCreation(g5))
+        g1_3 = VGroup(fg1.copy(),fg3.copy())
+        g5 = VGroup(g1_3,equation5)
+        self.play(
+            Transform(g1_3,fg5),
+            ShowCreation(equation5)
+        )
         self.wait(2)
         
         self.play(ApplyMethod( g5.scale,0.4) )
@@ -210,6 +219,118 @@ class Part1_2(MovingCameraScene):
 
         g = VGroup(*texes)
         self.play(ShowCreation(g))
+        self.wait(2)
+
+# 频谱图
+class Part1_2a(Scene):
+    def construct(self):
+        params = FFT_Song.getSongFormula("jojoVoice2.wav",0)
+        np_params = np.array(params)
+        freq = np.array([0]*5000) # 取前5000个频率及其对应强度
+        amplitudes =np.array([0]*5000) 
+        for i in range(5000):
+            p = params[i]
+            freq[i] = p[1]
+            amplitudes[i] = p[0]
+
+        y_max = FRAME_Y_RADIUS
+        x_max = FRAME_WIDTH
+        self.camera.set_frame_center((x_max/2,y_max/2+1,0))
+        self.camera.set_frame_height(y_max + 2)
+        self.camera.set_frame_width(x_max + 1)
+
+        #  max_freq = 5000
+        # max_amplitude = 500
+
+        axes = Axes(
+           x_min = 0, x_max= x_max+0.5,
+           y_min = 0, y_max= y_max+0.5,
+        )
+        y_tex = TextMobject("强度")
+        y_tex.set_x(0.5)
+        y_tex.set_y(y_max)
+        y_tex.scale(0.7)
+        x_tex = TextMobject("频率")
+        x_tex.set_x(x_max)
+        x_tex.set_y(0.5)
+        x_tex.scale(0.7)
+        title_tex = TextMobject("频谱")
+        title_tex.set_stroke(GREEN_C,1)
+        title_tex.scale(0.7)
+        title_tex.set_x(x_max/2)
+        title_tex.set_y(y_max)
+       
+        g = VGroup(axes,y_tex,x_tex,title_tex)
+        g.shift( (0,1,0) )
+        curve = VMobject()
+        max_freq = max(freq)
+        max_amplitude = max(amplitudes)
+        curve.set_points_smoothly([
+            (freq[i] / max_freq * x_max,amplitudes[i] / max_amplitude * y_max,0) 
+            for i in range(len(freq))
+        ])
+        curve.set_stroke(GREEN_C, 0.6)
+        curve.shift( (0,1,0) )
+        
+        # self.add(g)
+        self.play(ShowCreation(g))
+        self.play(ShowCreation(curve))
+        self.wait(2)
+
+# 相位谱
+class Part1_2b(Scene):
+    def construct(self):
+        params = FFT_Song.getSongFormula("jojoVoice2.wav",0)
+        np_params = np.array(params)
+        freq = np.array([0]*5000) # 取前5000个频率及其对应强度
+        amplitudes =np.array([0]*5000) 
+        for i in range(5000):
+            p = params[i]
+            freq[i] = p[1]
+            amplitudes[i] = p[2]
+
+        y_max = FRAME_Y_RADIUS
+        x_max = FRAME_WIDTH
+        self.camera.set_frame_center((x_max/2,1,0))
+        self.camera.set_frame_height(y_max * 2 + 4)
+        self.camera.set_frame_width(x_max + 2)
+
+        #  max_freq = 5000
+        # max_amplitude = 500
+
+        axes = Axes(
+           x_min = 0, x_max= x_max+0.5,
+           y_min = -y_max-0.5, y_max= y_max+0.5,
+        )
+        y_tex = TextMobject("相位")
+        y_tex.set_x(0.5)
+        y_tex.set_y(y_max)
+        y_tex.scale(0.7)
+        x_tex = TextMobject("频率")
+        x_tex.set_x(x_max + 0.5)
+        x_tex.set_y(0.5)
+        x_tex.scale(0.7)
+        title_tex = TextMobject("相位谱")
+        title_tex.set_stroke(GREEN_C,1)
+        title_tex.scale(0.7)
+        title_tex.set_x(x_max/2)
+        title_tex.set_y(y_max)
+       
+        g = VGroup(axes,y_tex,x_tex,title_tex)
+        g.shift( (0,1,0) )
+        curve = VMobject()
+        max_freq = max(freq)
+        max_amplitude = max(amplitudes)
+        curve.set_points_smoothly([
+            (freq[i] / max_freq * x_max,amplitudes[i] / max_amplitude * y_max / 2,0) 
+            for i in range(len(freq))
+        ])
+        curve.set_stroke(GREEN_C, 0.6)
+        curve.shift( (0,1,0) )
+        
+        # self.add(g)
+        self.play(ShowCreation(g))
+        self.play(ShowCreation(curve))
         self.wait(2)
 
 # 画出BGM声波图
